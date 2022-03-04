@@ -32,20 +32,29 @@ function addEvent(e) {
   name.classList.add('text-black-50');
 
   name.textContent = eventName.value;
-  eventCont.appendChild(timeLeft);
 
+  eventCont.classList.add('event-container'); //When event list is NOT empty
+  eventCont.appendChild(timeLeft);
   parsedDate = parseDate(date.value);
 
-  timer = setInterval(() => {
-    debugger;
-    eventCont.appendChild(timeLeft);
-    timerDone = countdown(name ,parsedDate, timeLeft);
-    eventCont.classList.add('event-container'); //When event list is NOT empty
+  // We keep in each h3 tag we create the info we need
+  timeLeft.name = name;
+  timeLeft.date = parsedDate;
+  timeLeft.h3 = timeLeft;
 
-    if (timerDone === 'done') {
-      clearInterval(timer);
-    }
-  }, 1000);
+  countdown(name ,parsedDate, timeLeft);
+
+  document.querySelectorAll('.countdown').forEach(event => {
+    debugger;
+    timer = setInterval(() => {
+      debugger;
+      timerDone = countdown(event.name, event.date, event.h3);
+
+      if (timerDone === 'done') {
+        clearInterval(timer);
+      }
+    }, 1000);
+  });
 
   eventName.value = '';
   date.value = '';
@@ -69,14 +78,13 @@ function countdown(inputEventName, inputDate, timeLeft) {
 
   
   debugger;
-  console.log(timespan);
+  // console.log(timespan);
   
   if (timespan <= 0) {
     timeLeft.innerHTML = inputEventName.innerHTML + ' event is a thing of the past 🙏';
     return 'done';
   } else {
     timeLeft.innerHTML = inputEventName.outerHTML + ' ⮕ ' + days+' Days ' + hours+' Hours ' + minutes+' Minutes ' + seconds+' Seconds';
-    // timeLeft.textContent = days+' Days ' + hours+' Hours ' + minutes+' Minutes ' + seconds+' Seconds';
   }
 
 }
