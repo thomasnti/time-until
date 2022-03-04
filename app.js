@@ -12,49 +12,42 @@ const second = 1000, // milliseconds
       day = 24 * hour;
 
 let parsedDate;
-debugger;
+
 eventCont.classList.remove('event-container'); // When event list is empty
 
+// Declare EVENT LISTENERS
 date.addEventListener('change', (e) => {
   parsedDate = parseDate(date.value)
 })
 
 form.addEventListener('submit', addEvent);
 
+document.addEventListener('DOMContentLoaded', getEvents);
+
 function addEvent(e) {
   e.preventDefault();
 
-  let timer, timerDone;
-  const timeLeft = document.createElement('h3'),
+  const eventTimeLeft = document.createElement('h3'),
         name = document.createElement('span');
 
-  timeLeft.classList.add('countdown');
+  eventTimeLeft.classList.add('countdown');
   name.classList.add('text-black-50');
 
   name.textContent = eventName.value;
 
   eventCont.classList.add('event-container'); //When event list is NOT empty
-  eventCont.appendChild(timeLeft);
+  eventCont.appendChild(eventTimeLeft);
   parsedDate = parseDate(date.value);
 
   // We keep in each h3 tag we create the info we need
-  timeLeft.name = name;
-  timeLeft.date = parsedDate;
-  timeLeft.h3 = timeLeft;
+  eventTimeLeft.name = name;
+  eventTimeLeft.date = parsedDate;
+  eventTimeLeft.h3 = eventTimeLeft;
 
-  countdown(name ,parsedDate, timeLeft);
+  storeEventInLS(eventTimeLeft);
+  countdown(name ,parsedDate, eventTimeLeft);
 
-  document.querySelectorAll('.countdown').forEach(event => {
-    debugger;
-    timer = setInterval(() => {
-      debugger;
-      timerDone = countdown(event.name, event.date, event.h3);
-
-      if (timerDone === 'done') {
-        clearInterval(timer);
-      }
-    }, 1000);
-  });
+  doCountdownInterval();
 
   eventName.value = '';
   date.value = '';
@@ -77,7 +70,7 @@ function countdown(inputEventName, inputDate, timeLeft) {
         seconds = Math.floor((timespan % minute) / second);
 
   
-  debugger;
+  // debugger;
   // console.log(timespan);
   
   if (timespan <= 0) {
@@ -88,3 +81,69 @@ function countdown(inputEventName, inputDate, timeLeft) {
   }
 
 }
+
+function doCountdownInterval() {
+  let timerDone;
+
+  document.querySelectorAll('.countdown').forEach(event => {
+    // debugger;
+    event.timer = setInterval(() => {
+      // debugger;
+      timerDone = countdown(event.name, event.date, event.h3);
+
+      if (timerDone === 'done') {
+        clearInterval(event.timer);
+      }
+    }, 1000);
+  });
+}
+
+function storeEventInLS(event) {
+  let events,
+    eventToStore = {
+      name: event.name.innerText,
+      date: event.date,
+    };
+
+  if (localStorage.getItem('events') === null) {
+    events = [];
+  } else {
+    events = JSON.parse(localStorage.getItem('events'));
+  }
+
+  events.push(eventToStore);
+  localStorage.setItem('events', JSON.stringify(events));
+}
+
+function getEvents() {
+  // debugger;
+  let events;
+
+  if (localStorage.getItem('events') === null) {
+    events = [];
+  } else {
+    events = JSON.parse(localStorage.getItem('events'));
+  }
+
+  events.forEach(event => {
+    let timerDone;
+    const eventTimeLeft = document.createElement('h3'),
+          name = document.createElement('span');
+    
+    eventTimeLeft.classList.add('countdown');
+    name.classList.add('text-black-50');
+
+    name.textContent = event.name;
+    eventCont.classList.add('event-container');
+    eventCont.appendChild(eventTimeLeft);
+
+    eventTimeLeft.name = name;
+    eventTimeLeft.date = new Date(event.date);
+    eventTimeLeft.h3 = eventTimeLeft;
+
+    countdown(name , eventTimeLeft.date, eventTimeLeft);
+    doCountdownInterval();
+  })
+}
+
+// TODO make some reusable functions
