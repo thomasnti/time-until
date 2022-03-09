@@ -24,6 +24,8 @@ form.addEventListener('submit', addEvent);
 
 document.addEventListener('DOMContentLoaded', getEvents);
 
+eventCont.addEventListener('click', deleteEvent);
+
 function addEvent(e) {
   e.preventDefault();
 
@@ -70,14 +72,15 @@ function countdown(inputEventName, inputDate, timeLeft) {
         seconds = Math.floor((timespan % minute) / second);
 
   
-  // debugger;
   // console.log(timespan);
+  const deleteIconHtml = '<a class="delete-icon mx-3"><i class="fas fa-trash fa-xs"></i></a>';
+
   
   if (timespan <= 0) {
-    timeLeft.innerHTML = inputEventName.innerHTML + ' event is a thing of the past 🙏';
+    timeLeft.innerHTML = inputEventName.outerHTML + ' event is a thing of the past 🙏' + ' (' +Math.abs(days) + ' days passed)' + deleteIconHtml;
     return 'done';
   } else {
-    timeLeft.innerHTML = inputEventName.outerHTML + ' ⮕ ' + days+' Days ' + hours+' Hours ' + minutes+' Minutes ' + seconds+' Seconds';
+    timeLeft.innerHTML = inputEventName.outerHTML + ' ⮕ ' + days+' Days ' + hours+' Hours ' + minutes+' Minutes ' + seconds+' Seconds' + deleteIconHtml;
   }
 
 }
@@ -86,15 +89,14 @@ function doCountdownInterval() {
   let timerDone;
 
   document.querySelectorAll('.countdown').forEach(event => {
-    // debugger;
     event.timer = setInterval(() => {
-      // debugger;
       timerDone = countdown(event.name, event.date, event.h3);
 
       if (timerDone === 'done') {
         clearInterval(event.timer);
       }
     }, 1000);
+
   });
 }
 
@@ -116,7 +118,6 @@ function storeEventInLS(event) {
 }
 
 function getEvents() {
-  // debugger;
   let events;
 
   if (localStorage.getItem('events') === null) {
@@ -146,4 +147,35 @@ function getEvents() {
   })
 }
 
-// TODO make some reusable functions
+function deleteEvent(e) {
+  console.log('clicked');
+
+  if (e.target.parentElement.className.includes('delete-icon')) {
+    if (confirm('Delete this event ??')) {
+      e.target.parentElement.parentElement.remove();
+
+      removeEventFromLS(e.target.parentElement.parentElement);
+    }
+  }
+}
+
+function removeEventFromLS(eventInfo) {
+  let events;
+
+  if (localStorage.getItem('events') === null) {
+    events = [];
+  } else {
+    events = JSON.parse(localStorage.getItem('events'));
+  }
+
+  events.forEach((event, index) => {
+    if (event.name === eventInfo.name.innerHTML) {
+      events.splice(index, 1);
+      return;
+    }
+  });
+
+  localStorage.setItem('events', JSON.stringify(events));
+}
+
+// TODO make some functions reusable

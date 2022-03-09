@@ -2,10 +2,6 @@ body {
   background-color: lightblue;
 }
 
-/* ul {
-  list-style: none;
-} */
-
 .event-container {
   border: 2px solid #5F9EA0;
   border-radius: 3px;
@@ -16,4 +12,14 @@ body {
 .countdown {
   color: #008B8B;
   margin-bottom: 0.8rem;
+}
+
+.delete-icon {
+  color: #CD5C5C;
+  cursor: pointer;
+}
+
+.delete-icon:hover {
+  color: #CD5C5C;
+  opacity: 0.8;
 }
